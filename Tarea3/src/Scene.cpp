@@ -131,17 +131,21 @@ void Scene::render()  {
 
         // la matriz de vista dentro el espejo
         glm::mat4 mirrorView = glm::lookAt(refPos, refTarget, refUp);
+        glBindFramebuffer(GL_FRAMEBUFFER, m_frameBuffer);
+        glViewport(0, 0, 1280, 720);  
+        glEnable(GL_DEPTH_TEST);
+        glFrontFace(GL_CCW);
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        ball->renderModel(mirrorView, m_projection, true);
+        chair->renderModel(mirrorView, m_projection, true);
+        mesa->renderModel(mirrorView, m_projection, true);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        int fbWidth, fbHeight;
+        glfwGetFramebufferSize(m_window->getWindow(), &fbWidth, &fbHeight);
+        glViewport(0, 0, fbWidth, fbHeight);
 
         glFrontFace(GL_CCW);
-        //TODO -> El renderizado de los modelos a la textura
-
-
-        //TODO -> Definir el buffer por defecto, es decir la ventana
-        // Cuidado con el tamaño que se define en el buffer
-
-
-        glFrontFace(GL_CCW);
-
 
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -151,15 +155,11 @@ void Scene::render()  {
         mesa->renderModel(m_view, m_projection,true);
         mirror->renderModel(m_view, m_projection,true);
 
-        //TODO DEFINIR LA TEXTURA A USAR
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureColorbuffer);
 
         plane->renderModel(m_view, m_projection,false);
 
-
-
-
-
-        // update models
         if (glfwGetKey(m_window->getWindow(), GLFW_KEY_DOWN) == GLFW_PRESS)
         {
             ball->updateModel(0.02f);
